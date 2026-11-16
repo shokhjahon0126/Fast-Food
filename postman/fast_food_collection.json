@@ -1,0 +1,265 @@
+{
+  "info": {
+    "_postman_id": "fast-food-api-collection-v1",
+    "name": "Fast-Food API Collection",
+    "description": "Fast-Food loyihasi uchun barcha API endpointlari to'plami",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login (JWT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "login", ""]
+            },
+            "description": "Foydalanuvchi tizimga kirishi va access/refresh tokenlarini olishi uchun endpoint."
+          },
+          "response": [
+            {
+              "name": "200 OK - Muvaffaqiyatli kirish",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"id\": 1,\n  \"role\": \"admin\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Token Refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/refresh/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "refresh", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cashier Management (Admin Only)",
+      "item": [
+        {
+          "name": "List Cashiers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/cashiers/?search=ali&page=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "cashiers", ""],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "ali"
+                },
+                {
+                  "key": "is_active",
+                  "value": "true"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Cashier",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"kassir_bekzod\",\n  \"password\": \"123456\",\n  \"first_name\": \"Bekzod\",\n  \"last_name\": \"Usmonov\",\n  \"phone\": \"+998901234599\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/cashiers/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "cashiers", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieve Cashier",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/cashiers/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "cashiers", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cashier",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Alisher\",\n  \"phone\": \"+998901234588\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/cashiers/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "cashiers", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Cashier",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/cashiers/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "cashiers", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "me", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Yangi Ism\",\n  \"last_name\": \"Yangi Familiya\",\n  \"phone\": \"+998909876543\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "me", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+
