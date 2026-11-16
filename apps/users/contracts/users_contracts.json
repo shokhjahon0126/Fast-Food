@@ -1,0 +1,227 @@
+{
+  "app": "users",
+  "version": "1.0.0",
+  "description": "Users ilovasi URL endpointlari va ma'lumot almashinish (Data Contracts) shartnomasi",
+  "endpoints": [
+    {
+      "url": "/api/v1/users/login/",
+      "method": "POST",
+      "description": "Foydalanuvchi tizimga kirish (JWT token olish)",
+      "access": "Public",
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "type": "object",
+          "required": ["username", "password"],
+          "properties": {
+            "username": { "type": "string", "example": "admin" },
+            "password": { "type": "string", "example": "123" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Muvaffaqiyatli kirish",
+          "body": {
+            "type": "object",
+            "properties": {
+              "refresh": { "type": "string" },
+              "access": { "type": "string" },
+              "id": { "type": "integer", "example": 1 },
+              "role": { "type": "string", "enum": ["admin", "cashier"], "example": "admin" }
+            }
+          }
+        },
+        "401": {
+          "description": "Noto'g'ri login yoki parol",
+          "body": {
+            "detail": "No active account found with the given credentials"
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/users/cashiers/",
+      "method": "GET",
+      "description": "Kassirlar ro'yxatini olish (Filtrlash, qidiruv va sahifalash bilan)",
+      "access": "Admin Only",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <access_token>"
+        },
+        "query_parameters": {
+          "search": { "type": "string", "description": "username, ism, familiya, telefon bo'yicha qidiruv" },
+          "phone": { "type": "string", "description": "Telefon raqami bo'yicha qisman filter" },
+          "is_active": { "type": "boolean", "description": "Faollik holati bo'yicha filter" },
+          "page": { "type": "integer", "default": 1 },
+          "page_size": { "type": "integer", "default": 10 }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Kassirlar ro'yxati",
+          "body": {
+            "count": 4,
+            "next": null,
+            "previous": null,
+            "results": [
+              {
+                "id": 1,
+                "username": "kassir_ali",
+                "first_name": "Ali",
+                "last_name": "Valiyev",
+                "phone": "+998901234501",
+                "role": "cashier",
+                "is_active": true,
+                "date_joined": "2026-11-16T10:00:00Z"
+              }
+            ]
+          }
+        },
+        "403": {
+          "description": "Faqat Administrator ruxsati talab qilinadi",
+          "body": {
+            "detail": "Ushbu amalni faqat Administrator bajarishi mumkin."
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/users/cashiers/",
+      "method": "POST",
+      "description": "Yangi kassir yaratish (API orqali Admin yaratish taqiqlangan)",
+      "access": "Admin Only",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <access_token>",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "type": "object",
+          "required": ["username", "password"],
+          "properties": {
+            "username": { "type": "string", "example": "kassir_bekzod" },
+            "password": { "type": "string", "example": "123456" },
+            "first_name": { "type": "string", "example": "Bekzod" },
+            "last_name": { "type": "string", "example": "Usmonov" },
+            "phone": { "type": "string", "example": "+998901234599" }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Kassir muvaffaqiyatli yaratildi",
+          "body": {
+            "id": 5,
+            "username": "kassir_bekzod",
+            "first_name": "Bekzod",
+            "last_name": "Usmonov",
+            "phone": "+998901234599",
+            "role": "cashier",
+            "is_active": true,
+            "date_joined": "2026-11-16T12:00:00Z"
+          }
+        },
+        "400": {
+          "description": "Validatsiya xatoligi (takroriy username/telefon yoki zaif parol)",
+          "body": {
+            "username": ["Bunday username allaqachon mavjud."]
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/users/cashiers/{id}/",
+      "method": "DELETE",
+      "description": "Kassirni o'chirish (Admin o'zini va boshqa adminni o'chira olmaydi)",
+      "access": "Admin Only",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <access_token>"
+        },
+        "path_parameters": {
+          "id": { "type": "integer", "required": true }
+        }
+      },
+      "responses": {
+        "204": {
+          "description": "Kassir muvaffaqiyatli o'chirildi"
+        },
+        "400": {
+          "description": "Admin o'zini o'zi o'chira olmasligi",
+          "body": {
+            "detail": "Administrator o'zining shaxsiy hisobini o'chira olmaydi."
+          }
+        },
+        "403": {
+          "description": "Boshqa adminni o'chirish taqiqlangan",
+          "body": {
+            "detail": "Administrator boshqa Administrator hisobini o'chirish huquqiga ega emas."
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/users/me/",
+      "method": "GET",
+      "description": "Autentifikatsiyadan o'tgan foydalanuvchining o'z profili",
+      "access": "Authenticated (Admin & Cashier)",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <access_token>"
+        }
+      },
+      "responses": {
+        "200": {
+          "body": {
+            "id": 1,
+            "username": "kassir_ali",
+            "first_name": "Ali",
+            "last_name": "Valiyev",
+            "phone": "+998901234501",
+            "role": "cashier",
+            "date_joined": "2026-11-16T10:00:00Z"
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/users/me/",
+      "method": "PATCH",
+      "description": "Shaxsiy profilni tahrirlash (Rolni o'zgartirish qat'iyan man etiladi)",
+      "access": "Authenticated (Admin & Cashier)",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <access_token>",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "first_name": { "type": "string", "example": "Alisher" },
+            "last_name": { "type": "string", "example": "Valiyev" },
+            "phone": { "type": "string", "example": "+998909876543" },
+            "password": { "type": "string", "example": "new_secret_123" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Profil muvaffaqiyatli yangilandi",
+          "body": {
+            "id": 1,
+            "username": "kassir_ali",
+            "first_name": "Alisher",
+            "last_name": "Valiyev",
+            "phone": "+998909876543",
+            "role": "cashier",
+            "date_joined": "2026-11-16T10:00:00Z"
+          }
+        }
+      }
+    }
+  ]
+}
+
