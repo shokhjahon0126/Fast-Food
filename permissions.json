@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "project": "Fast-Food",
+  "version": "1.0.0",
+  "description": "Agentlarning harakatlari, ruxsatlari va cheklovlari bo'yicha qat'iy konfiguratsiya",
+  "security_mode": "STRICT_CONFIRMATION",
+  "permissions": {
+    "auto_approved": {
+      "description": "Foydalanuvchidan ruxsat so'ramasdan mustaqil bajarilishi mumkin bo'lgan amallar",
+      "codebase_inspection": {
+        "allowed": true,
+        "actions": [
+          "read_file",
+          "list_files",
+          "search_codebase",
+          "view_directory_tree",
+          "read_logs",
+          "inspect_schemas"
+        ]
+      },
+      "git_read_only": {
+        "allowed": true,
+        "commands": [
+          "git status",
+          "git diff",
+          "git log",
+          "git branch",
+          "git show"
+        ]
+      },
+      "independent_testing": {
+        "allowed": true,
+        "description": "QA agentining kodni va tizimni mustaqil test qilishi uchun to'liq ruxsat",
+        "commands": [
+          "python manage.py test",
+          "pytest",
+          "flake8",
+          "black --check",
+          "mypy",
+          "coverage run",
+          "coverage report"
+        ]
+      },
+      "environment_inspection": {
+        "allowed": true,
+        "commands": [
+          "python --version",
+          "pip list",
+          "pip check"
+        ]
+      }
+    },
+    "requires_explicit_user_approval": {
+      "description": "Foydalanuvchining to'g'ridan-to'g'ri tasdig'isiz mutlaqo ruxsat berilmaydigan amallar (Bir qator ham kod yozilmaydi!)",
+      "code_modification": {
+        "allowed_without_approval": false,
+        "actions": [
+          "write_file",
+          "edit_file",
+          "create_file",
+          "delete_file"
+        ],
+        "scope": [
+          "apps/**",
+          "core/**",
+          "manage.py",
+          "requirements.txt",
+          ".env",
+          "migrations/**"
+        ]
+      },
+      "database_mutations": {
+        "allowed_without_approval": false,
+        "commands": [
+          "python manage.py makemigrations",
+          "python manage.py migrate",
+          "python manage.py flush",
+          "python manage.py sqlflush",
+          "dropdb",
+          "createdb"
+        ]
+      },
+      "git_write_operations": {
+        "allowed_without_approval": false,
+        "commands": [
+          "git add",
+          "git commit",
+          "git push",
+          "git reset",
+          "git checkout --",
+          "git clean",
+          "git rebase",
+          "git merge"
+        ]
+      },
+      "package_management": {
+        "allowed_without_approval": false,
+        "commands": [
+          "pip install",
+          "pip uninstall"
+        ]
+      }
+    }
+  },
+  "roles_and_responsibilities": {
+    "senior_backend_engineer": {
+      "architecture": "Clean Architecture / Modular / Service-Selector Layer",
+      "database_rules": [
+        "db_index on filter/search/sort fields",
+        "Mandatory resolution of N+1 queries",
+        "Explicit select_related for ForeignKey and OneToOne",
+        "Explicit prefetch_related for ManyToMany and Reverse ForeignKeys",
+        "Proper use of only() and defer() where applicable"
+      ],
+      "drf_standards": [
+        "Filtering with django-filter FilterSets",
+        "Searching with DRF SearchFilter",
+        "Pagination on all list endpoints",
+        "Throttling (Rate Limiting) on sensitive and high-frequency endpoints",
+        "Strict serializer validations and error handling"
+      ],
+      "postman_requirement": {
+        "enabled": true,
+        "output_path": "postman/fast_food_collection.json",
+        "description": "Har bir yangi/o'zgargan API darhol Postman collection fayliga URL, params, headers, body va response namunalari bilan kiritilishi shart."
+      },
+      "mock_data_requirement": {
+        "enabled": true,
+        "command": "python manage.py seed_data",
+        "description": "Har bir yozilgan model uchun mock datalar mavjud bo'lishi va bitta buyruq bilan bazaga to'ldirilishi shart."
+      },
+      "git_branching_policy": {
+        "enforce_separate_branch": true,
+        "naming_convention": ["feature/*", "fix/*", "perf/*", "refactor/*"],
+        "disallow_direct_commit_to_main": true,
+        "description": "Barcha o'zgarishlar alohida git branchlarda amalga oshirilishi shart. Main/master branchga to'g'ridan-to'g'ri yozish taqiqlanadi."
+      },
+      "data_contracts_policy": {
+        "enabled": true,
+        "format": "JSON",
+        "storage_path": "apps/<app_name>/contracts/*.json",
+        "description": "Har bir ilovaning URL endpointlari, request/response namunalari va tizimlararo ma'lumot almashinuvi JSON kontraktlar sifatida saqlab boriladi."
+      }
+    },
+    "senior_qa_engineer": {
+      "autonomy": "Foydalanuvchi prompti va qabul mezonlari bo'yicha kodni to'liq mustaqil test qilish huquqiga ega.",
+      "test_coverage_standards": [
+        "API endpoint status codes and JSON response structure",
+        "Permission checks (Anonymous vs Authenticated vs Staff/Admin)",
+        "Edge cases and negative test scenarios (invalid payloads, constraints)",
+        "Filter, search, ordering, pagination verification",
+        "Throttling rate limit enforcement checks",
+        "Database query count assertions (assertNumQueries) to prevent N+1 regressions"
+      ]
+    }
+  },
+  "workflow_pipeline": {
+    "phase_1": {
+      "name": "Plan (Reja)",
+      "rules": [
+        "Vazifani chuqur tahlil qilish",
+        "Noaniq qismlar bo'lsa, foydalanuvchidan ketma-ket, birma-bir savol so'rab aniqlashtirish",
+        "Har bir qadamni belgilab borish (Checklist: [ ] Kutilmoqda, [/] Jarayonda, [x] Bajarildi)",
+        "FOYDALANUVCHI TASDIQLAMAGUNCHA BIROR QATOR HAM KOD YOZMASLIK"
+      ]
+    },
+    "phase_2": {
+      "name": "Execution & Report (Amalga oshirish va Hisobot)",
+      "rules": [
+        "Faqat foydalanuvchi 'Davom et' yoki 'Tasdiqlayman' deganidan keyin kod yozishni boshlash",
+        "Har bir yangi o'zgarishni alohida git branch ochib amalga oshirish",
+        "Senior standartlarida kod yozish va QA tomonidan mustaqil test qilish",
+        "Har bir app URL data almashinishi (contracts) bo'yicha JSON fayllarni shakllantirish",
+        "Postman collection va Mock datalarni tayyorlash",
+        "Bajarilgan ishlar bo'yicha batafsil hisobot taqdim etish"
+      ]
+    }
+  }
+}
+
