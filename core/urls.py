@@ -26,11 +26,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Apps
-    path('api/v1/users/', include("apps.users.urls")),
     path('User/', include("apps.users.urls")),
 
     #Swagger
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
