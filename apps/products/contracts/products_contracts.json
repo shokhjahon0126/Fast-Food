@@ -4,7 +4,7 @@
   "description": "Products (Kategoriyalar, Menyu va Retseptlar) ilovasi URL endpointlari va ma'lumot almashinuv kontraktlari",
   "endpoints": [
     {
-      "url": "/api/v1/products/categories/",
+      "url": "/products/categories/",
       "method": "GET",
       "description": "Kategoriyalar ro'yxati",
       "access": "Authenticated",
@@ -26,7 +26,7 @@
       }
     },
     {
-      "url": "/api/v1/products/",
+      "url": "/products/",
       "method": "GET",
       "description": "Menyu mahsulotlari va ularning retseptlari ro'yxati (N+1 muammosidan xoli)",
       "access": "Authenticated (Admin & Cashier)",
@@ -72,7 +72,7 @@
       }
     },
     {
-      "url": "/api/v1/products/{id}/set-recipe/",
+      "url": "/products/{id}/set-recipe/",
       "method": "POST",
       "description": "Mahsulot uchun to'liq retsept (BOM) tarkibini sozlash",
       "access": "Admin Only",

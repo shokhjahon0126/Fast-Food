@@ -33,7 +33,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [permissions.IsAuthenticated()]
+            return [permissions.AllowAny()]
         return [IsAdminRole()]
 
 
@@ -54,7 +54,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [permissions.IsAuthenticated()]
+            return [permissions.AllowAny()]
         return [IsAdminRole()]
 
     @action(detail=True, methods=['post'], url_path='set-recipe', permission_classes=[IsAdminRole])

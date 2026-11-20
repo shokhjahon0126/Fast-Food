@@ -11,6 +11,7 @@ from apps.users.serializers import (
     CashierUpdateSerializer,
     UserProfileSerializer,
     CustomTokenObtainPairSerializer,
+    CustomerRegisterSerializer,
 )
 
 
@@ -62,3 +63,12 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class CustomerRegisterView(generics.CreateAPIView):
+    """
+    Ommaviy ro'yxatdan o'tish (Public Registration).
+    Istalgan yangi mijoz ro'yxatdan o'ta oladi. Rol avtomatik CUSTOMER bo'ladi.
+    """
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CustomerRegisterSerializer

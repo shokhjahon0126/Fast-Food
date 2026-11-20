@@ -27,6 +27,29 @@
       "name": "Authentication",
       "item": [
         {
+          "name": "Register Customer (Mijoz ro'yxatdan o'tishi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"mijoz_bobur\",\n  \"password\": \"parol123\",\n  \"first_name\": \"Bobur\",\n  \"last_name\": \"Alimov\",\n  \"phone\": \"+998901234567\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "register", ""]
+            },
+            "description": "Ommaviy ro'yxatdan o'tish (Public Register). Rol avtomatik ravishda 'customer' qilib belgilanadi."
+          },
+          "response": []
+        },
+        {
           "name": "Login (JWT)",
           "request": {
             "method": "POST",
@@ -41,7 +64,7 @@
               "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/login/",
+              "raw": "{{baseUrl}}/users/login/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "login", ""]
             },
@@ -77,7 +100,7 @@
               "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/refresh/",
+              "raw": "{{baseUrl}}/users/refresh/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "refresh", ""]
             }
@@ -100,7 +123,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/cashiers/?search=ali&page=1",
+              "raw": "{{baseUrl}}/users/cashiers/?search=ali&page=1",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "cashiers", ""],
               "query": [
@@ -140,7 +163,7 @@
               "raw": "{\n  \"username\": \"kassir_bekzod\",\n  \"password\": \"123456\",\n  \"first_name\": \"Bekzod\",\n  \"last_name\": \"Usmonov\",\n  \"phone\": \"+998901234599\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/cashiers/",
+              "raw": "{{baseUrl}}/users/cashiers/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "cashiers", ""]
             }
@@ -158,7 +181,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/cashiers/1/",
+              "raw": "{{baseUrl}}/users/cashiers/1/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "cashiers", "1", ""]
             }
@@ -184,7 +207,7 @@
               "raw": "{\n  \"first_name\": \"Alisher\",\n  \"phone\": \"+998901234588\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/cashiers/1/",
+              "raw": "{{baseUrl}}/users/cashiers/1/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "cashiers", "1", ""]
             }
@@ -202,7 +225,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/cashiers/1/",
+              "raw": "{{baseUrl}}/users/cashiers/1/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "cashiers", "1", ""]
             }
@@ -225,7 +248,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/me/",
+              "raw": "{{baseUrl}}/users/me/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "me", ""]
             }
@@ -251,7 +274,7 @@
               "raw": "{\n  \"first_name\": \"Yangi Ism\",\n  \"last_name\": \"Yangi Familiya\",\n  \"phone\": \"+998909876543\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/me/",
+              "raw": "{{baseUrl}}/users/me/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "users", "me", ""]
             }
@@ -271,7 +294,7 @@
               { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/inventory/ingredients/?search=tovuq",
+              "raw": "{{baseUrl}}/inventory/ingredients/?search=tovuq",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "inventory", "ingredients", ""],
               "query": [{ "key": "search", "value": "tovuq" }]
@@ -292,7 +315,7 @@
               "raw": "{\n  \"name\": \"Tovuq go'shti (file)\",\n  \"unit\": \"kg\",\n  \"min_stock\": \"5.000\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/inventory/ingredients/",
+              "raw": "{{baseUrl}}/inventory/ingredients/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "inventory", "ingredients", ""]
             }
@@ -307,7 +330,7 @@
               { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/inventory/supplies/",
+              "raw": "{{baseUrl}}/inventory/supplies/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "inventory", "supplies", ""]
             }
@@ -327,7 +350,7 @@
               "raw": "{\n  \"ingredient_id\": 1,\n  \"quantity\": \"10.000\",\n  \"cost_price\": \"45000.00\",\n  \"supplier\": \"Elit Go'sht MChJ\",\n  \"notes\": \"Yangi partiya\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/inventory/supplies/",
+              "raw": "{{baseUrl}}/inventory/supplies/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "inventory", "supplies", ""]
             }
@@ -347,7 +370,7 @@
               { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/products/categories/",
+              "raw": "{{baseUrl}}/products/categories/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "products", "categories", ""]
             }
@@ -367,7 +390,7 @@
               "raw": "{\n  \"name\": \"Burgerlar\",\n  \"order\": 1\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/products/categories/",
+              "raw": "{{baseUrl}}/products/categories/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "products", "categories", ""]
             }
@@ -382,7 +405,7 @@
               { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/products/?search=burger",
+              "raw": "{{baseUrl}}/products/?search=burger",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "products", ""],
               "query": [{ "key": "search", "value": "burger" }]
@@ -403,7 +426,7 @@
               "raw": "{\n  \"category\": 1,\n  \"name\": \"Chizburger\",\n  \"price\": \"35000.00\",\n  \"description\": \"Klassik mazali chizburger\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/products/",
+              "raw": "{{baseUrl}}/products/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "products", ""]
             }
@@ -423,9 +446,115 @@
               "raw": "{\n  \"items\": [\n    {\n      \"ingredient_id\": 1,\n      \"quantity\": \"1.000\"\n    },\n    {\n      \"ingredient_id\": 2,\n      \"quantity\": \"2.000\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/products/1/set-recipe/",
+              "raw": "{{baseUrl}}/products/1/set-recipe/",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "products", "1", "set-recipe", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders Management (Buyurtmalar va Kassa)",
+      "item": [
+        {
+          "name": "Create Order (Mijoz buyurtma berishi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2,\n      \"notes\": \"Piyozsiz\"\n    }\n  ],\n  \"order_type\": \"takeaway\",\n  \"payment_type\": \"cash\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/my-orders/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "my-orders", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Orders (Mijozning buyurtmalari)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/my-orders/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "my-orders", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cashier Queue (Kassir: Barcha buyurtmalar)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/cashier/?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "cashier", ""],
+              "query": [{ "key": "status", "value": "pending" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cashier Accept (Kassir: Qabul qilish)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/cashier/1/accept/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "cashier", "1", "accept", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cashier Complete (Topshirish va Ombor Chiqimi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/cashier/1/complete/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "cashier", "1", "complete", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cashier Cancel (Bekor qilish)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Mijoz so'roviga binoan bekor qilindi\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/cashier/1/cancel/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "cashier", "1", "cancel", ""]
             }
           },
           "response": []
