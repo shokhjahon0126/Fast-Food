@@ -4,7 +4,7 @@
   "description": "Inventory (Ombor va Xomashyo) ilovasi URL endpointlari va ma'lumot almashinuv kontraktlari",
   "endpoints": [
     {
-      "url": "/api/v1/inventory/ingredients/",
+      "url": "/inventory/ingredients/",
       "method": "GET",
       "description": "Xomashyolar ro'yxati va ularning ombordagi joriy qoldiqlari",
       "access": "Authenticated (Admin & Cashier)",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "url": "/api/v1/inventory/ingredients/",
+      "url": "/inventory/ingredients/",
       "method": "POST",
       "description": "Yangi xomashyo yaratish",
       "access": "Admin Only",
@@ -61,7 +61,7 @@
       }
     },
     {
-      "url": "/api/v1/inventory/supplies/",
+      "url": "/inventory/supplies/",
       "method": "POST",
       "description": "Omborga xomashyo kirim qilish (Avtomatik ravishda qoldiqni oshiradi)",
       "access": "Admin Only",

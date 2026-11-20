@@ -6,6 +6,8 @@ from apps.inventory.models import Ingredient, MeasurementUnit
 from apps.inventory.services import supply_create
 from apps.products.models import Category, Product
 from apps.products.services import set_product_recipe
+from apps.orders.services import order_create, order_accept, order_complete
+from apps.orders.models import OrderType, PaymentType
 
 User = get_user_model()
 
@@ -51,6 +53,23 @@ class Command(BaseCommand):
         cashier_user.role = UserRole.CASHIER
         cashier_user.save()
         self.stdout.write(self.style.SUCCESS(f"Kassir tayyor: {cashier_user.username}"))
+
+        # 2.1 Mijoz yaratish
+        customer_user, _ = User.objects.get_or_create(
+            username="mijoz_bobur",
+            defaults={
+                "first_name": "Bobur",
+                "last_name": "Alimov",
+                "phone": "+998901234567",
+                "role": UserRole.CUSTOMER,
+                "is_staff": False,
+                "is_superuser": False,
+            },
+        )
+        customer_user.set_password("123")
+        customer_user.role = UserRole.CUSTOMER
+        customer_user.save()
+        self.stdout.write(self.style.SUCCESS(f"Mijoz tayyor: {customer_user.username}"))
 
         # 3. Xomashyolar (Ingredients)
         ingredients_info = [
@@ -148,4 +167,42 @@ class Command(BaseCommand):
         ])
 
         self.stdout.write(self.style.SUCCESS("Barcha mahsulotlar va retseptlar (BOM) muvaffaqiyatli saqlandi!"))
+
+        # 8. Namunaviy Buyurtmalar (Orders)
+        # 1) Yangi buyurtma (PENDING)
+        order_pending = order_create(
+            customer=customer_user,
+            items_data=[
+                {"product_id": p_chizburger.id, "quantity": 2, "notes": "Iltimos, issiqroq bo'lsin"}
+            ],
+            order_type=OrderType.TAKEAWAY,
+            payment_type=PaymentType.CASH,
+            notes="Kassir qabul qilishi kutilmoqda",
+        )
+
+        # 2) Qabul qilingan buyurtma (ACCEPTED)
+        order_accepted = order_create(
+            customer=customer_user,
+            items_data=[
+                {"product_id": p_lavash.id, "quantity": 1, "notes": "Achchiq bo'lmasin"}
+            ],
+            order_type=OrderType.DELIVERY,
+            delivery_address="Toshkent, Yunusobod 4-mavze",
+            payment_type=PaymentType.ONLINE,
+        )
+        order_accept(order=order_accepted, cashier_user=cashier_user)
+
+        # 3) Topshirilgan buyurtma (COMPLETED - ombordan xomashyo chiqim qilingan)
+        order_completed = order_create(
+            customer=customer_user,
+            items_data=[
+                {"product_id": p_double_burger.id, "quantity": 1}
+            ],
+            order_type=OrderType.DINE_IN,
+            payment_type=PaymentType.CARD,
+        )
+        order_accept(order=order_completed, cashier_user=cashier_user)
+        order_complete(order=order_completed, cashier_user=cashier_user)
+
+        self.stdout.write(self.style.SUCCESS("Namunaviy buyurtmalar (PENDING, ACCEPTED, COMPLETED) yaratildi!"))
         self.stdout.write(self.style.SUCCESS("Mock ma'lumotlar to'liq va muvaffaqiyatli kiritildi!"))
