@@ -560,6 +560,65 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Analytics & Dashboard (Admin Sotuv Tahlili)",
+      "item": [
+        {
+          "name": "Admin Dashboard Overview (Umumiy ko'rsatkichlar)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/dashboard/",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "dashboard", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Product Sales Ranking (Mahsulotlar reytingi)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/products-ranking/?ordering=-total_sold_quantity",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "products-ranking", ""],
+              "query": [
+                { "key": "ordering", "value": "-total_sold_quantity" },
+                { "key": "category", "value": "1", "disabled": true },
+                { "key": "start_date", "value": "2026-11-01", "disabled": true },
+                { "key": "end_date", "value": "2026-11-20", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sales Trend (Kunlik trend grafigi)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/sales-trend/?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "sales-trend", ""],
+              "query": [
+                { "key": "days", "value": "30" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

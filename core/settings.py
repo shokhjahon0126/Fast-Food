@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'apps.inventory',
     'apps.products',
     'apps.orders',
+    'apps.analytics',
     "phonenumber_field",
 ]
 

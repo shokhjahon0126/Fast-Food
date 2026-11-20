@@ -1,0 +1,153 @@
+{
+  "app": "analytics",
+  "version": "1.0.0",
+  "description": "Analytics & Dashboard (Admin sotuv tahlili va ko'rsatkichlar) ilovasi ma'lumot almashinuv kontraktlari",
+  "endpoints": [
+    {
+      "url": "/analytics/dashboard/",
+      "method": "GET",
+      "description": "Administrator Dashboard umumiy ko'rsatkichlari (kunlik, haftalik, oylik tushum, buyurtmalar statusi va top/past mahsulotlar)",
+      "access": "Admin Only (IsAdminRole)",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <admin_jwt_token>"
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Muvaffaqiyatli hisobot",
+          "body": {
+            "daily": {
+              "revenue": "150000.00",
+              "orders_count": 5
+            },
+            "weekly": {
+              "revenue": "1250000.00",
+              "orders_count": 35
+            },
+            "monthly": {
+              "revenue": "5400000.00",
+              "orders_count": 160
+            },
+            "all_time_revenue": "12500000.00",
+            "order_statuses": {
+              "completed": 160,
+              "cancelled": 5,
+              "pending": 2,
+              "accepted": 3,
+              "total": 170,
+              "cancelled_revenue_loss": "145000.00"
+            },
+            "top_selling_products": [
+              {
+                "id": 1,
+                "name": "Double Burger",
+                "category_id": 1,
+                "category_name": "Burgerlar",
+                "price": "48000.00",
+                "is_active": true,
+                "total_sold_quantity": 45,
+                "total_revenue": "2160000.00"
+              }
+            ],
+            "least_selling_products": [
+              {
+                "id": 5,
+                "name": "Ayron 0.5L",
+                "category_id": 3,
+                "category_name": "Ichimliklar",
+                "price": "8000.00",
+                "is_active": true,
+                "total_sold_quantity": 2,
+                "total_revenue": "16000.00"
+              }
+            ]
+          }
+        },
+        "401": {
+          "description": "Autentifikatsiyadan o'tilmagan",
+          "body": { "detail": "Authentication credentials were not provided." }
+        },
+        "403": {
+          "description": "Admin bo'lmagan foydalanuvchi (Ruxsat berilmagan)",
+          "body": { "detail": "Ushbu amalni bajarish uchun administrator huquqi talab qilinadi." }
+        }
+      }
+    },
+    {
+      "url": "/analytics/products-ranking/",
+      "method": "GET",
+      "description": "Barcha mahsulotlarning to'liq sotuv reytingi (saralash, qidiruv va filtrlar bilan)",
+      "access": "Admin Only (IsAdminRole)",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <admin_jwt_token>"
+        },
+        "query_params": {
+          "ordering": { "type": "string", "example": "-total_sold_quantity" },
+          "category": { "type": "integer", "example": 1 },
+          "search": { "type": "string", "example": "Burger" },
+          "start_date": { "type": "string", "example": "2026-11-01" },
+          "end_date": { "type": "string", "example": "2026-11-20" },
+          "page": { "type": "integer", "example": 1 }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Sahifalangan mahsulotlar reytingi ro'yxati",
+          "body": {
+            "count": 12,
+            "next": null,
+            "previous": null,
+            "results": [
+              {
+                "id": 1,
+                "name": "Double Burger",
+                "category_id": 1,
+                "category_name": "Burgerlar",
+                "price": "48000.00",
+                "is_active": true,
+                "total_sold_quantity": 45,
+                "total_revenue": "2160000.00"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "url": "/analytics/sales-trend/",
+      "method": "GET",
+      "description": "Kunlar kesimida dinamik sotuvlar grafigi (trend)",
+      "access": "Admin Only (IsAdminRole)",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer <admin_jwt_token>"
+        },
+        "query_params": {
+          "days": { "type": "integer", "example": 30 },
+          "start_date": { "type": "string", "example": "2026-11-01" },
+          "end_date": { "type": "string", "example": "2026-11-20" }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Kunlik sotuv dinamikasi",
+          "body": [
+            {
+              "date": "2026-11-19",
+              "orders_count": 8,
+              "total_revenue": "320000.00"
+            },
+            {
+              "date": "2026-11-20",
+              "orders_count": 12,
+              "total_revenue": "540000.00"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+
