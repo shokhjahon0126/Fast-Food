@@ -1,0 +1,97 @@
+{
+  "app": "inventory",
+  "version": "1.0.0",
+  "description": "Inventory (Ombor va Xomashyo) ilovasi URL endpointlari va ma'lumot almashinuv kontraktlari",
+  "endpoints": [
+    {
+      "url": "/api/v1/inventory/ingredients/",
+      "method": "GET",
+      "description": "Xomashyolar ro'yxati va ularning ombordagi joriy qoldiqlari",
+      "access": "Authenticated (Admin & Cashier)",
+      "query_parameters": {
+        "name": { "type": "string", "description": "Xomashyo nomi bo'yicha qidiruv" },
+        "unit": { "type": "string", "enum": ["kg", "g", "l", "ml", "piece"] },
+        "low_stock": { "type": "boolean", "description": "Qoldig'i minimal limitdan kam qolganlarini filtrlash" }
+      },
+      "responses": {
+        "200": {
+          "description": "Xomashyolar ro'yxati",
+          "body": {
+            "count": 5,
+            "results": [
+              {
+                "id": 1,
+                "name": "Tovuq go'shti (file)",
+                "unit": "kg",
+                "unit_display": "Kilogramm (kg)",
+                "stock": "25.000",
+                "min_stock": "5.000",
+                "is_active": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/inventory/ingredients/",
+      "method": "POST",
+      "description": "Yangi xomashyo yaratish",
+      "access": "Admin Only",
+      "request": {
+        "headers": { "Authorization": "Bearer <token>", "Content-Type": "application/json" },
+        "body": {
+          "name": "Burger noni",
+          "unit": "piece",
+          "min_stock": "20.000"
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Xomashyo yaratildi",
+          "body": {
+            "id": 2,
+            "name": "Burger noni",
+            "unit": "piece",
+            "stock": "0.000",
+            "min_stock": "20.000",
+            "is_active": true
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/inventory/supplies/",
+      "method": "POST",
+      "description": "Omborga xomashyo kirim qilish (Avtomatik ravishda qoldiqni oshiradi)",
+      "access": "Admin Only",
+      "request": {
+        "headers": { "Authorization": "Bearer <token>", "Content-Type": "application/json" },
+        "body": {
+          "ingredient_id": 1,
+          "quantity": "10.000",
+          "cost_price": "45000.00",
+          "supplier": "Elit Go'sht MChJ",
+          "notes": "Ertalabki yangi partiya"
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Kirim muvaffaqiyatli saqlandi va ombor qoldig'i yangilandi",
+          "body": {
+            "id": 10,
+            "ingredient": 1,
+            "ingredient_name": "Tovuq go'shti (file)",
+            "ingredient_unit": "kg",
+            "quantity": "10.000",
+            "cost_price": "45000.00",
+            "total_price": "450000.00",
+            "supplier": "Elit Go'sht MChJ",
+            "created_at": "2026-11-19T10:00:00Z"
+          }
+        }
+      }
+    }
+  ]
+}
+

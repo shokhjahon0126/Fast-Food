@@ -259,6 +259,178 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Inventory Management (Ombor)",
+      "item": [
+        {
+          "name": "List Ingredients",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/inventory/ingredients/?search=tovuq",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "ingredients", ""],
+              "query": [{ "key": "search", "value": "tovuq" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ingredient",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tovuq go'shti (file)\",\n  \"unit\": \"kg\",\n  \"min_stock\": \"5.000\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/inventory/ingredients/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "ingredients", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Supplies (Kirimlar)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/inventory/supplies/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "supplies", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Supply (Kirim qilish)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingredient_id\": 1,\n  \"quantity\": \"10.000\",\n  \"cost_price\": \"45000.00\",\n  \"supplier\": \"Elit Go'sht MChJ\",\n  \"notes\": \"Yangi partiya\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/inventory/supplies/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "supplies", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products & Recipes (Menyu va Retsept)",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/categories/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "categories", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Burgerlar\",\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/categories/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "categories", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Products (with Recipes)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/?search=burger",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", ""],
+              "query": [{ "key": "search", "value": "burger" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": 1,\n  \"name\": \"Chizburger\",\n  \"price\": \"35000.00\",\n  \"description\": \"Klassik mazali chizburger\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set Product Recipe (BOM sozlash)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"ingredient_id\": 1,\n      \"quantity\": \"1.000\"\n    },\n    {\n      \"ingredient_id\": 2,\n      \"quantity\": \"2.000\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/1/set-recipe/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "1", "set-recipe", ""]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
