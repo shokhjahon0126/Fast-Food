@@ -9,9 +9,13 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+from datetime import timedelta
+
 
 from pathlib import Path
 from decouple import config
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,6 +35,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.spl
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +48,10 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_filters',
 
+    #Local apps
     'apps.users',
+    'apps.inventory',
+    'apps.products',
     "phonenumber_field",
 ]
 
@@ -173,4 +181,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Default pages API description",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=config("ACCESS_TOKEN_LIFETIME",cast=int,default=15)),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=config("REFRESH_TOKEN_LIFETIME",cast=int,default=30)),
+    "SIGNING_KEY": config("SECRET_KEY"),
 }

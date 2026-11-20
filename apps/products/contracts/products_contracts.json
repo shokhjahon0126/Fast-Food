@@ -1,0 +1,107 @@
+{
+  "app": "products",
+  "version": "1.0.0",
+  "description": "Products (Kategoriyalar, Menyu va Retseptlar) ilovasi URL endpointlari va ma'lumot almashinuv kontraktlari",
+  "endpoints": [
+    {
+      "url": "/api/v1/products/categories/",
+      "method": "GET",
+      "description": "Kategoriyalar ro'yxati",
+      "access": "Authenticated",
+      "responses": {
+        "200": {
+          "body": {
+            "count": 3,
+            "results": [
+              {
+                "id": 1,
+                "name": "Burgerlar",
+                "order": 1,
+                "is_active": true,
+                "products_count": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/products/",
+      "method": "GET",
+      "description": "Menyu mahsulotlari va ularning retseptlari ro'yxati (N+1 muammosidan xoli)",
+      "access": "Authenticated (Admin & Cashier)",
+      "query_parameters": {
+        "category": { "type": "integer" },
+        "name": { "type": "string" },
+        "min_price": { "type": "number" },
+        "max_price": { "type": "number" }
+      },
+      "responses": {
+        "200": {
+          "body": {
+            "count": 1,
+            "results": [
+              {
+                "id": 1,
+                "category": 1,
+                "category_name": "Burgerlar",
+                "name": "Chizburger",
+                "price": "35000.00",
+                "description": "Shirali go'sht va eritilgan pishloqli burger",
+                "is_active": true,
+                "recipes": [
+                  {
+                    "id": 1,
+                    "ingredient": 2,
+                    "ingredient_name": "Burger noni",
+                    "ingredient_unit": "piece",
+                    "quantity": "1.000"
+                  },
+                  {
+                    "id": 2,
+                    "ingredient": 3,
+                    "ingredient_name": "Mol go'shti kotleti",
+                    "ingredient_unit": "piece",
+                    "quantity": "2.000"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "url": "/api/v1/products/{id}/set-recipe/",
+      "method": "POST",
+      "description": "Mahsulot uchun to'liq retsept (BOM) tarkibini sozlash",
+      "access": "Admin Only",
+      "request": {
+        "headers": { "Authorization": "Bearer <token>", "Content-Type": "application/json" },
+        "body": {
+          "items": [
+            { "ingredient_id": 2, "quantity": "1.000" },
+            { "ingredient_id": 3, "quantity": "2.000" },
+            { "ingredient_id": 4, "quantity": "0.050" }
+          ]
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Retsept muvaffaqiyatli saqlandi",
+          "body": [
+            {
+              "id": 1,
+              "product": 1,
+              "ingredient": 2,
+              "ingredient_name": "Burger noni",
+              "ingredient_unit": "piece",
+              "quantity": "1.000"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+
