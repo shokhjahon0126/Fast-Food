@@ -7,6 +7,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 class UserRole(models.TextChoices):
     ADMIN = 'admin', _('Admin')
     CASHIER = 'cashier', _('Cashier')
+    CUSTOMER = 'customer', _('Mijoz')
 
 
 class User(AbstractUser):
@@ -42,6 +43,10 @@ class User(AbstractUser):
     @property
     def is_cashier(self) -> bool:
         return self.role == UserRole.CASHIER
+
+    @property
+    def is_customer(self) -> bool:
+        return self.role == UserRole.CUSTOMER
 
     def __str__(self):
         full_name = self.get_full_name()

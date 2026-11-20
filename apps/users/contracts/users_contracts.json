@@ -4,7 +4,7 @@
   "description": "Users ilovasi URL endpointlari va ma'lumot almashinish (Data Contracts) shartnomasi",
   "endpoints": [
     {
-      "url": "/api/v1/users/login/",
+      "url": "/users/login/",
       "method": "POST",
       "description": "Foydalanuvchi tizimga kirish (JWT token olish)",
       "access": "Public",
@@ -43,7 +43,7 @@
       }
     },
     {
-      "url": "/api/v1/users/cashiers/",
+      "url": "/users/cashiers/",
       "method": "GET",
       "description": "Kassirlar ro'yxatini olish (Filtrlash, qidiruv va sahifalash bilan)",
       "access": "Admin Only",
@@ -89,7 +89,7 @@
       }
     },
     {
-      "url": "/api/v1/users/cashiers/",
+      "url": "/users/cashiers/",
       "method": "POST",
       "description": "Yangi kassir yaratish (API orqali Admin yaratish taqiqlangan)",
       "access": "Admin Only",
@@ -133,7 +133,7 @@
       }
     },
     {
-      "url": "/api/v1/users/cashiers/{id}/",
+      "url": "/users/cashiers/{id}/",
       "method": "DELETE",
       "description": "Kassirni o'chirish (Admin o'zini va boshqa adminni o'chira olmaydi)",
       "access": "Admin Only",
@@ -164,7 +164,7 @@
       }
     },
     {
-      "url": "/api/v1/users/me/",
+      "url": "/users/me/",
       "method": "GET",
       "description": "Autentifikatsiyadan o'tgan foydalanuvchining o'z profili",
       "access": "Authenticated (Admin & Cashier)",
@@ -188,7 +188,7 @@
       }
     },
     {
-      "url": "/api/v1/users/me/",
+      "url": "/users/me/",
       "method": "PATCH",
       "description": "Shaxsiy profilni tahrirlash (Rolni o'zgartirish qat'iyan man etiladi)",
       "access": "Authenticated (Admin & Cashier)",

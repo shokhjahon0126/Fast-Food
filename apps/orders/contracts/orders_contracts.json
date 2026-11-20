@@ -1,0 +1,123 @@
+{
+  "app": "orders",
+  "version": "1.0.0",
+  "description": "Orders (Buyurtmalar va Kassir boshqaruvi) ilovasi URL endpointlari va ma'lumot almashinuv kontraktlari",
+  "endpoints": [
+    {
+      "url": "/users/register/",
+      "method": "POST",
+      "description": "Yangi mijoz ro'yxatdan o'tishi (Public Registration)",
+      "access": "Public (AllowAny)",
+      "request": {
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "type": "object",
+          "required": ["username", "password", "phone"],
+          "properties": {
+            "username": { "type": "string", "example": "mijoz_bobur" },
+            "password": { "type": "string", "example": "parol123" },
+            "first_name": { "type": "string", "example": "Bobur" },
+            "last_name": { "type": "string", "example": "Alimov" },
+            "phone": { "type": "string", "example": "+998901234567" }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Mijoz muvaffaqiyatli ro'yxatdan o'tdi",
+          "body": {
+            "id": 10,
+            "username": "mijoz_bobur",
+            "first_name": "Bobur",
+            "last_name": "Alimov",
+            "phone": "+998901234567",
+            "role": "customer"
+          }
+        }
+      }
+    },
+    {
+      "url": "/orders/my-orders/",
+      "method": "POST",
+      "description": "Ro'yxatdan o'tgan mijoz tomonidan buyurtma berish (Status: PENDING)",
+      "access": "Authenticated Customer",
+      "request": {
+        "headers": { "Authorization": "Bearer <token>", "Content-Type": "application/json" },
+        "body": {
+          "type": "object",
+          "required": ["items"],
+          "properties": {
+            "items": [
+              { "product_id": 1, "quantity": 2, "notes": "Iltimos, piyozsiz bo'lsin" }
+            ],
+            "order_type": { "type": "string", "enum": ["dine_in", "takeaway", "delivery"], "default": "takeaway" },
+            "payment_type": { "type": "string", "enum": ["cash", "card", "online"], "default": "cash" },
+            "delivery_address": { "type": "string", "example": "Toshkent sh., Chilonzor 9-mavze" }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Buyurtma yaratildi (Omborga hali tegilmaydi)",
+          "body": {
+            "id": 1,
+            "order_number": "FF-9A8B7C6D",
+            "status": "pending",
+            "status_display": "Kutilmoqda (Yangi)",
+            "total_price": "70000.00",
+            "items": [
+              {
+                "product": 1,
+                "product_name": "Chizburger",
+                "quantity": 2,
+                "unit_price": "35000.00",
+                "total_price": "70000.00"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "url": "/orders/cashier/{id}/accept/",
+      "method": "POST",
+      "description": "Kassir buyurtmani qabul qilishi (Status: ACCEPTED - Ombor o'zgarmaydi)",
+      "access": "Cashier / Admin Only",
+      "request": {
+        "headers": { "Authorization": "Bearer <token>" }
+      },
+      "responses": {
+        "200": {
+          "description": "Buyurtma qabul qilindi va oshxonaga yuborildi",
+          "body": {
+            "id": 1,
+            "status": "accepted",
+            "status_display": "Qabul qilindi (Tayyorlanmoqda)",
+            "accepted_by_username": "kassir_ali"
+          }
+        }
+      }
+    },
+    {
+      "url": "/orders/cashier/{id}/complete/",
+      "method": "POST",
+      "description": "Buyurtma mijozga topshirildi (Status: COMPLETED) - AYAN SHU PAYTDA OMBOR CHIQIMI AMALGA OSHIRILADI",
+      "access": "Cashier / Admin Only",
+      "request": {
+        "headers": { "Authorization": "Bearer <token>" }
+      },
+      "responses": {
+        "200": {
+          "description": "Buyurtma topshirildi va retsept bo'yicha xomashyolar ombordan kamaytirildi",
+          "body": {
+            "id": 1,
+            "status": "completed",
+            "status_display": "Topshirildi (Yakunlandi)",
+            "is_stock_deducted": true
+          }
+        }
+      }
+    }
+  ]
+}
+

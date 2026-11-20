@@ -109,3 +109,52 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class CustomerRegisterSerializer(serializers.Serializer):
+    """
+    Mijozlar ro'yxatdan o'tishi uchun serializer.
+    Rol maydoni kiritilmaydi, avtomatik ravishda CUSTOMER ('customer') qilib belgilanadi.
+    """
+    username = serializers.CharField(max_length=150, required=True)
+    password = serializers.CharField(write_only=True, required=True, min_length=4)
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
+    last_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
+    phone = PhoneNumberField(required=True)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Ushbu username allaqachon band.")
+        return value
+
+    def validate_phone(self, value):
+        if value and User.objects.filter(phone=value).exists():
+            raise serializers.ValidationError("Ushbu telefon raqam allaqachon ro'yxatdan o'tgan.")
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(
+            **validated_data,
+            role=UserRole.CUSTOMER,
+            is_staff=False,
+            is_superuser=False,
+        )
+        try:
+            validate_password(password, user=user)
+        except DjangoValidationError as err:
+            raise serializers.ValidationError({"password": list(err.messages)})
+        user.set_password(password)
+        user.save()
+        return user
+
+    def to_representation(self, instance):
+        return {
+            "id": instance.id,
+            "username": instance.username,
+            "first_name": instance.first_name,
+            "last_name": instance.last_name,
+            "phone": str(instance.phone) if instance.phone else None,
+            "role": instance.role,
+        }
+
+

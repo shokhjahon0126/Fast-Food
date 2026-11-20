@@ -30,6 +30,34 @@ class IsCashierRole(BasePermission):
         )
 
 
+class IsAdminOrCashier(BasePermission):
+    """
+    Ruxsat Administrator yoki Kassir rolidagi foydalanuvchilarga beriladi.
+    """
+    message = "Ushbu amalni faqat Kassir yoki Administrator bajarishi mumkin."
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            (request.user.role in [UserRole.ADMIN, UserRole.CASHIER] or request.user.is_superuser)
+        )
+
+
+class IsCustomerRole(BasePermission):
+    """
+    Ruxsat faqat Mijoz (Customer) rolidagi foydalanuvchilarga beriladi.
+    """
+    message = "Ushbu amalni faqat Mijoz bajarishi mumkin."
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            request.user.role == UserRole.CUSTOMER
+        )
+
+
 class IsOwnerOrAdmin(BasePermission):
     """
     Obyekt egasi yoki Admin uchun ruxsat.
