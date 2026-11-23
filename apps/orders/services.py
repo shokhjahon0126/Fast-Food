@@ -1,10 +1,14 @@
 from decimal import Decimal
 from django.db import transaction
 from django.db.models import F
+from django.contrib.auth import get_user_model
 from rest_framework.exceptions import ValidationError
+from apps.users.models import UserRole
 from apps.products.models import Product
 from apps.inventory.models import Ingredient
 from apps.orders.models import Order, OrderItem, OrderStatus, OrderType, PaymentType
+
+User = get_user_model()
 
 
 @transaction.atomic
@@ -74,6 +78,89 @@ def order_create(
     order.save(update_fields=['total_price'])
 
     return order
+
+
+@transaction.atomic
+def telegram_order_create(
+    *,
+    telegram_id: int,
+    phone: str,
+    first_name: str = "",
+    last_name: str = "",
+    telegram_username: str = "",
+    items_data: list[dict],
+    order_type: str = OrderType.TAKEAWAY,
+    payment_type: str = PaymentType.CASH,
+    delivery_address: str = "",
+    notes: str = "",
+) -> Order:
+    """
+    Telegram WebApp orqali buyurtma qabul qilish xizmati.
+    Telegram foydalanuvchisini avtomatik aniqlaydi yoki yaratadi (Role: CUSTOMER),
+    so'ngra buyurtmani PENDING holatida rasmiylashtiradi.
+    """
+    if not telegram_id:
+        raise ValidationError({"telegram_id": "Telegram ID ko'rsatilishi shart."})
+
+    if not phone:
+        raise ValidationError({"phone": "Telefon raqami ko'rsatilishi shart."})
+
+    # 1. Foydalanuvchini telegram_id yoki phone bo'yicha topish/yaratish
+    customer = User.objects.filter(telegram_id=telegram_id).first()
+
+    if not customer:
+        customer = User.objects.filter(phone=phone).first()
+        if customer:
+            # Agar mavjud bo'lsa, telegram_id ni biriktiramiz
+            customer.telegram_id = telegram_id
+            if first_name and not customer.first_name:
+                customer.first_name = first_name
+            if last_name and not customer.last_name:
+                customer.last_name = last_name
+            customer.save(update_fields=['telegram_id', 'first_name', 'last_name'])
+        else:
+            # Yangi mijoz yaratamiz
+            base_username = telegram_username or f"tg_{telegram_id}"
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}_{counter}"
+                counter += 1
+
+            customer = User.objects.create(
+                username=username,
+                role=UserRole.CUSTOMER,
+                phone=phone,
+                first_name=first_name or "",
+                last_name=last_name or "",
+                telegram_id=telegram_id,
+            )
+            customer.set_unusable_password()
+            customer.save()
+    else:
+        # Mavjud mijoz ma'lumotlarini yangilash (agar telefon yoki ism yangilangan bo'lsa)
+        update_fields = []
+        if phone and customer.phone != phone:
+            customer.phone = phone
+            update_fields.append('phone')
+        if first_name and not customer.first_name:
+            customer.first_name = first_name
+            update_fields.append('first_name')
+        if last_name and not customer.last_name:
+            customer.last_name = last_name
+            update_fields.append('last_name')
+        if update_fields:
+            customer.save(update_fields=update_fields)
+
+    # 2. Buyurtmani umumiy order_create orqali yaratish
+    return order_create(
+        customer=customer,
+        items_data=items_data,
+        order_type=order_type,
+        payment_type=payment_type,
+        delivery_address=delivery_address,
+        notes=notes,
+    )
 
 
 def order_accept(*, order: Order, cashier_user) -> Order:

@@ -5,6 +5,7 @@ from apps.products.views import CategoryViewSet, ProductViewSet, ProductRecipeVi
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'recipes', ProductRecipeViewSet, basename='product-recipe')
+router.register(r'products', ProductViewSet, basename='product-alias')
 router.register(r'', ProductViewSet, basename='product')
 
 urlpatterns = [

@@ -117,6 +117,51 @@
           }
         }
       }
+    },
+    {
+      "url": "/orders/telegram-order/",
+      "method": "POST",
+      "description": "Telegram WebApp orqali buyurtma qabul qilish (Public API, avto-mijoz identifikatsiyasi)",
+      "access": "Public (Telegram WebApp)",
+      "request": {
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "type": "object",
+          "required": ["telegram_id", "phone", "items"],
+          "properties": {
+            "telegram_id": { "type": "integer", "example": 987654321 },
+            "first_name": { "type": "string", "example": "Javohir" },
+            "last_name": { "type": "string", "example": "Usmonov" },
+            "telegram_username": { "type": "string", "example": "javohir_u" },
+            "phone": { "type": "string", "example": "+998901234567" },
+            "order_type": { "type": "string", "enum": ["takeaway", "dine_in", "delivery"], "example": "takeaway" },
+            "payment_type": { "type": "string", "enum": ["cash", "card", "online"], "example": "cash" },
+            "delivery_address": { "type": "string", "example": "Toshkent sh., Chilonzor 9" },
+            "notes": { "type": "string", "example": "Piyozsiz bo'lsin" },
+            "items": [
+              {
+                "product_id": 1,
+                "quantity": 2,
+                "notes": "Issiqroq bo'lsin"
+              }
+            ]
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Telegram buyurtmasi muvaffaqiyatli yaratildi",
+          "body": {
+            "id": 15,
+            "order_number": "FF-C9A8B7D6",
+            "status": "pending",
+            "status_display": "Kutilmoqda (Yangi)",
+            "total_price": "96000.00",
+            "customer_name": "Javohir Usmonov",
+            "customer_phone": "+998901234567"
+          }
+        }
+      }
     }
   ]
 }

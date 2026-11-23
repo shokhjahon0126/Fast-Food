@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Fast-Food Express | Telegram WebApp</title>
+  
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #f8fafc);
+      --text: var(--tg-theme-text-color, #0f172a);
+      --hint: var(--tg-theme-hint-color, #64748b);
+      --btn: var(--tg-theme-button-color, #e11d48);
+      --btn-text: var(--tg-theme-button-text-color, #ffffff);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .bottom-sheet {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24 select-none">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🍔</span>
+        <div>
+          <h1 class="text-base font-bold leading-tight">Fast-Food Express</h1>
+          <p class="text-xs text-emerald-600 font-medium flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Ochiq • Buyurtmalar qabul qilinmoqda
+          </p>
+        </div>
+      </div>
+      <div id="user-badge" class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-medium hidden">
+        👋 <span id="user-name">Mijoz</span>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="mt-2.5 relative">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Taom yoki ichimlik qidirish..."
+        class="w-full bg-slate-100 text-sm rounded-xl pl-9 pr-8 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
+      >
+      <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
+      <button id="clear-search" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 hidden text-sm">✕</button>
+    </div>
+  </header>
+
+  <!-- Categories Horizontal Navigation -->
+  <nav class="sticky top-[105px] z-20 bg-white/95 backdrop-blur-md px-4 py-2.5 border-b border-slate-100">
+    <div id="categories-container" class="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
+      <button
+        onclick="filterCategory('all')"
+        class="cat-chip whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-600 text-white shadow-sm transition-all"
+        data-cat="all"
+      >
+        Barchasi
+      </button>
+      <!-- Categories dynamically rendered here -->
+    </div>
+  </nav>
+
+  <!-- Main Content: Products List -->
+  <main class="max-w-xl mx-auto px-4 py-3">
+    <div id="loading-state" class="py-16 text-center text-slate-400">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-rose-500 border-t-transparent mb-3"></div>
+      <p class="text-sm">Menyu yuklanmoqda...</p>
+    </div>
+
+    <div id="empty-state" class="py-16 text-center text-slate-400 hidden">
+      <span class="text-4xl block mb-2">🍽️</span>
+      <p class="text-sm font-medium">Mahsulot topilmadi</p>
+    </div>
+
+    <div id="products-grid" class="space-y-3 hidden">
+      <!-- Products dynamically rendered here -->
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Cart Bar -->
+  <div
+    id="cart-bar"
+    class="fixed bottom-0 inset-x-0 z-40 p-4 bg-gradient-to-t from-white via-white to-transparent transform translate-y-full transition-transform duration-300 pointer-events-none"
+  >
+    <div class="max-w-xl mx-auto pointer-events-auto">
+      <button
+        onclick="openCheckoutModal()"
+        class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white py-3.5 px-5 rounded-2xl shadow-lg shadow-rose-600/30 font-semibold flex items-center justify-between transition-all"
+      >
+        <div class="flex items-center gap-2">
+          <span class="bg-white/20 text-white text-xs px-2.5 py-0.5 rounded-full font-bold" id="cart-badge">0</span>
+          <span class="text-sm font-medium">Savatcha</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-base font-bold" id="cart-total-bar">0 so'm</span>
+          <span class="text-lg">→</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal / Bottom Sheet -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-end justify-center">
+    <div class="bottom-sheet bg-white w-full max-w-xl rounded-t-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span>🛒</span> Buyurtmani rasmiylashtirish
+        </h2>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-sm">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-5 overflow-y-auto space-y-5 flex-1">
+        
+        <!-- Cart Items Summary -->
+        <div>
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tanlangan mahsulotlar</h3>
+          <div id="modal-cart-items" class="divide-y divide-slate-100 border border-slate-100 rounded-2xl p-2 bg-slate-50">
+            <!-- Items injected via JS -->
+          </div>
+          <div class="flex items-center justify-between mt-2.5 px-2">
+            <span class="text-sm font-medium text-slate-500">Jami to'lov:</span>
+            <span class="text-lg font-bold text-rose-600" id="modal-cart-total">0 so'm</span>
+          </div>
+        </div>
+
+        <!-- Customer Details Form -->
+        <form id="order-form" onsubmit="submitOrder(event)" class="space-y-4">
+          
+          <!-- Phone Number -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Telefon raqamingiz *</label>
+            <div class="relative">
+              <input
+                type="tel"
+                id="customer-phone"
+                required
+                placeholder="+998 90 123 45 67"
+                class="w-full bg-slate-100 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
+              >
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Kassir siz bilan bog'lanishi uchun zarur.</p>
+          </div>
+
+          <!-- Order Type -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Buyurtma turi</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="order_type" value="takeaway" checked onchange="toggleDeliveryAddress()" class="peer sr-only">
+                <div class="p-2.5 text-center text-xs font-semibold rounded-xl border border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-600 transition-all">
+                  🛍️ Olib ketish
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="order_type" value="dine_in" onchange="toggleDeliveryAddress()" class="peer sr-only">
+                <div class="p-2.5 text-center text-xs font-semibold rounded-xl border border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-600 transition-all">
+                  🍽️ Joyida
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="order_type" value="delivery" onchange="toggleDeliveryAddress()" class="peer sr-only">
+                <div class="p-2.5 text-center text-xs font-semibold rounded-xl border border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-600 transition-all">
+                  🛵 Yetkazish
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Delivery Address (Hidden by default) -->
+          <div id="address-container" class="hidden">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Yetkazib berish manzili *</label>
+            <textarea
+              id="delivery-address"
+              rows="2"
+              placeholder="Shahar, tuman, ko'cha, uy raqami..."
+              class="w-full bg-slate-100 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
+            ></textarea>
+          </div>
+
+          <!-- Payment Type -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">To'lov usuli</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="payment_type" value="cash" checked class="peer sr-only">
+                <div class="p-2.5 text-center text-xs font-semibold rounded-xl border border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-600 transition-all">
+                  💵 Naqd pul
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="payment_type" value="card" class="peer sr-only">
+                <div class="p-2.5 text-center text-xs font-semibold rounded-xl border border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-600 transition-all">
+                  💳 Karta
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="payment_type" value="online" class="peer sr-only">
+                <div class="p-2.5 text-center text-xs font-semibold rounded-xl border border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 peer-checked:text-rose-600 transition-all">
+                  📲 Click/Payme
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Izoh (ixtiyoriy)</label>
+            <input
+              type="text"
+              id="order-notes"
+              placeholder="Masalan: Piyozsiz bo'lsin, sous alohida..."
+              class="w-full bg-slate-100 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
+            >
+          </div>
+
+          <div id="order-error" class="text-xs text-rose-600 font-medium bg-rose-50 p-3 rounded-xl hidden"></div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="submit-order-btn"
+            class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-4"
+          >
+            <span>Tasdiqlash va Buyurtma berish</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Confirmation Modal -->
+  <div id="success-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+        ✓
+      </div>
+      <h2 class="text-lg font-bold text-slate-900 mb-1">Buyurtma Qabul Qilindi!</h2>
+      <p class="text-xs text-slate-500 mb-4">Kassir tez orada buyurtmangizni ko'rib chiqadi.</p>
+      
+      <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-5 border border-slate-100">
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Buyurtma raqami:</span>
+          <span class="font-bold text-slate-800" id="success-order-number">FF-XXXX</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Jami summa:</span>
+          <span class="font-bold text-rose-600" id="success-total-price">0 so'm</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Holati:</span>
+          <span class="font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Kutilmoqda (Pending)</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <button
+          onclick="closeSuccessModal()"
+          class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-3 rounded-xl font-semibold text-xs transition-all"
+        >
+          Yangi buyurtma berish
+        </button>
+        <button
+          onclick="closeTelegramApp()"
+          class="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-md shadow-rose-600/20"
+        >
+          Telegramga qaytish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // 1. Telegram WebApp Initialization
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.expand();
+      tg.enableClosingConfirmation();
+      try {
+        tg.headerColor = '#ffffff';
+        tg.backgroundColor = '#ffffff';
+      } catch (e) {}
+    }
+
+    // State
+    let categories = [];
+    let products = [];
+    let cart = {}; // { productId: { product, quantity } }
+    let currentCategory = 'all';
+    let telegramUser = null;
+
+    // Detect Telegram User
+    if (tg?.initDataUnsafe?.user) {
+      telegramUser = tg.initDataUnsafe.user;
+      document.getElementById('user-badge').classList.remove('hidden');
+      document.getElementById('user-name').textContent = telegramUser.first_name || 'Mijoz';
+    }
+
+    // Number formatter
+    function formatMoney(amount) {
+      return Number(amount).toLocaleString('uz-UZ') + " so'm";
+    }
+
+    // Fetch initial data
+    async function loadData() {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch('/products/categories/'),
+          fetch('/products/?is_active=true')
+        ]);
+
+        const catData = await catRes.json();
+        const prodData = await prodRes.json();
+
+        categories = catData.results || catData;
+        products = prodData.results || prodData;
+
+        renderCategories();
+        renderProducts();
+        document.getElementById('loading-state').classList.add('hidden');
+      } catch (err) {
+        console.error("Ma'lumotlarni yuklashda xatolik:", err);
+        document.getElementById('loading-state').innerHTML = `
+          <div class="text-rose-500 font-medium">Ma'lumot yuklanmadi. Qayta urinib ko'ring.</div>
+          <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-slate-100 rounded-xl text-xs font-semibold">Qayta yuklash</button>
+        `;
+      }
+    }
+
+    // Render Categories
+    function renderCategories() {
+      const container = document.getElementById('categories-container');
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'cat-chip whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all';
+        btn.dataset.cat = cat.id;
+        btn.textContent = cat.name;
+        btn.onclick = () => filterCategory(cat.id);
+        container.appendChild(btn);
+      });
+    }
+
+    // Filter by Category
+    function filterCategory(catId) {
+      currentCategory = catId;
+      document.querySelectorAll('.cat-chip').forEach(btn => {
+        if (btn.dataset.cat == catId) {
+          btn.className = 'cat-chip whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-600 text-white shadow-sm transition-all';
+        } else {
+          btn.className = 'cat-chip whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all';
+        }
+      });
+      renderProducts();
+    }
+
+    // Search filter
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const q = e.target.value.trim();
+      document.getElementById('clear-search').classList.toggle('hidden', !q);
+      renderProducts();
+    });
+
+    document.getElementById('clear-search').addEventListener('click', () => {
+      document.getElementById('search-input').value = '';
+      document.getElementById('clear-search').classList.add('hidden');
+      renderProducts();
+    });
+
+    // Render Products Grid
+    function renderProducts() {
+      const grid = document.getElementById('products-grid');
+      const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+
+      const filtered = products.filter(p => {
+        const matchesCategory = currentCategory === 'all' || p.category === currentCategory || p.category_id === currentCategory;
+        const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery) || (p.description && p.description.toLowerCase().includes(searchQuery));
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.classList.add('hidden');
+        document.getElementById('empty-state').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('empty-state').classList.add('hidden');
+      grid.classList.remove('hidden');
+      grid.innerHTML = '';
+
+      filtered.forEach(p => {
+        const qty = cart[p.id]?.quantity || 0;
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-3 border border-slate-100 shadow-sm flex items-center justify-between gap-3 hover:shadow-md transition-shadow';
+
+        const imgPlaceholder = p.image
+          ? `<img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-xl object-cover">`
+          : `<div class="w-16 h-16 rounded-xl bg-rose-50 flex items-center justify-center text-2xl">🍔</div>`;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            ${imgPlaceholder}
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-bold text-slate-900 truncate">${p.name}</h3>
+              <p class="text-xs text-slate-400 line-clamp-1">${p.description || "Mazali va yangi taom"}</p>
+              <div class="text-sm font-extrabold text-rose-600 mt-1">${formatMoney(p.price)}</div>
+            </div>
+          </div>
+          <div class="flex-shrink-0" id="btn-container-${p.id}">
+            ${renderCartButtons(p.id, qty)}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderCartButtons(pId, qty) {
+      if (qty === 0) {
+        return `
+          <button
+            onclick="addToCart(${pId})"
+            class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs flex items-center gap-1 active:scale-95 transition-all"
+          >
+            <span>+</span> Qo'shish
+          </button>
+        `;
+      }
+      return `
+        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+          <button
+            onclick="updateCartItem(${pId}, -1)"
+            class="w-7 h-7 bg-white text-slate-800 rounded-lg font-bold flex items-center justify-center text-sm shadow-sm active:scale-95"
+          >
+            −
+          </button>
+          <span class="w-4 text-center font-bold text-xs text-slate-800">${qty}</span>
+          <button
+            onclick="updateCartItem(${pId}, 1)"
+            class="w-7 h-7 bg-rose-600 text-white rounded-lg font-bold flex items-center justify-center text-sm shadow-sm active:scale-95"
+          >
+            +
+          </button>
+        </div>
+      `;
+    }
+
+    // Cart Management
+    function addToCart(pId) {
+      const prod = products.find(p => p.id === pId);
+      if (!prod) return;
+
+      cart[pId] = { product: prod, quantity: 1 };
+      updateCartUI();
+      refreshProductButton(pId);
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function updateCartItem(pId, delta) {
+      if (!cart[pId]) return;
+
+      cart[pId].quantity += delta;
+      if (cart[pId].quantity <= 0) {
+        delete cart[pId];
+      }
+      updateCartUI();
+      refreshProductButton(pId);
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function refreshProductButton(pId) {
+      const container = document.getElementById(`btn-container-${pId}`);
+      if (container) {
+        const qty = cart[pId]?.quantity || 0;
+        container.innerHTML = renderCartButtons(pId, qty);
+      }
+    }
+
+    function updateCartUI() {
+      let totalQty = 0;
+      let totalPrice = 0;
+
+      Object.values(cart).forEach(item => {
+        totalQty += item.quantity;
+        totalPrice += item.quantity * Number(item.product.price);
+      });
+
+      const bar = document.getElementById('cart-bar');
+      if (totalQty > 0) {
+        bar.classList.remove('translate-y-full');
+        document.getElementById('cart-badge').textContent = totalQty;
+        document.getElementById('cart-total-bar').textContent = formatMoney(totalPrice);
+      } else {
+        bar.classList.add('translate-y-full');
+      }
+    }
+
+    // Checkout Modal
+    function openCheckoutModal() {
+      const itemsContainer = document.getElementById('modal-cart-items');
+      itemsContainer.innerHTML = '';
+
+      let grandTotal = 0;
+
+      Object.values(cart).forEach(item => {
+        const itemTotal = item.quantity * Number(item.product.price);
+        grandTotal += itemTotal;
+
+        const row = document.createElement('div');
+        row.className = 'py-2 flex items-center justify-between text-xs';
+        row.innerHTML = `
+          <div>
+            <span class="font-bold text-slate-800">${item.product.name}</span>
+            <span class="text-slate-400"> × ${item.quantity}</span>
+          </div>
+          <span class="font-bold text-slate-900">${formatMoney(itemTotal)}</span>
+        `;
+        itemsContainer.appendChild(row);
+      });
+
+      document.getElementById('modal-cart-total').textContent = formatMoney(grandTotal);
+      document.getElementById('checkout-modal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+      document.getElementById('order-error').classList.add('hidden');
+    }
+
+    function toggleDeliveryAddress() {
+      const orderType = document.querySelector('input[name="order_type"]:checked').value;
+      const addrContainer = document.getElementById('address-container');
+      const addrInput = document.getElementById('delivery-address');
+
+      if (orderType === 'delivery') {
+        addrContainer.classList.remove('hidden');
+        addrInput.required = true;
+      } else {
+        addrContainer.classList.add('hidden');
+        addrInput.required = false;
+      }
+    }
+
+    // Submit Order
+    async function submitOrder(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('submit-order-btn');
+      const errorBox = document.getElementById('order-error');
+      errorBox.classList.add('hidden');
+
+      const phone = document.getElementById('customer-phone').value.trim();
+      const orderType = document.querySelector('input[name="order_type"]:checked').value;
+      const paymentType = document.querySelector('input[name="payment_type"]:checked').value;
+      const address = document.getElementById('delivery-address').value.trim();
+      const notes = document.getElementById('order-notes').value.trim();
+
+      const items = Object.values(cart).map(i => ({
+        product_id: i.product.id,
+        quantity: i.quantity,
+      }));
+
+      if (items.length === 0) {
+        errorBox.textContent = "Savatchangiz bo'sh.";
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block animate-spin">⏳</span> Rasmiylashtirilmoqda...`;
+
+      const payload = {
+        telegram_id: telegramUser ? telegramUser.id : (Date.now() % 1000000000),
+        first_name: telegramUser ? telegramUser.first_name : "Mijoz",
+        last_name: telegramUser ? (telegramUser.last_name || "") : "",
+        telegram_username: telegramUser ? (telegramUser.username || "") : "",
+        phone: phone.startsWith('+') ? phone : '+998' + phone.replace(/\D/g, ''),
+        order_type: orderType,
+        payment_type: paymentType,
+        delivery_address: address,
+        notes: notes,
+        items: items,
+      };
+
+      try {
+        const res = await fetch('/orders/telegram-order/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // Success
+          closeCheckoutModal();
+          document.getElementById('success-order-number').textContent = data.order_number;
+          document.getElementById('success-total-price').textContent = formatMoney(data.total_price);
+          document.getElementById('success-modal').classList.remove('hidden');
+
+          // Reset Cart
+          cart = {};
+          updateCartUI();
+          renderProducts();
+
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        } else {
+          errorBox.textContent = data.detail || (data.phone ? data.phone[0] : "Xatolik yuz berdi. Qayta tekshirib ko'ring.");
+          errorBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorBox.textContent = "Server bilan bog'lanishda xatolik. Qaytadan urinib ko'ring.";
+        errorBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Tasdiqlash va Buyurtma berish</span>`;
+      }
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('success-modal').classList.add('hidden');
+    }
+
+    function closeTelegramApp() {
+      if (tg) {
+        tg.close();
+      } else {
+        closeSuccessModal();
+      }
+    }
+
+    // Start
+    loadData();
+  </script>
+</body>
+</html>
+
