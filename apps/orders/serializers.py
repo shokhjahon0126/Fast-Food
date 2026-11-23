@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from apps.orders.models import Order, OrderItem, OrderStatus, OrderType, PaymentType
-from apps.orders.services import order_create
+from apps.orders.services import order_create, telegram_order_create
 
 
 class OrderItemInputSerializer(serializers.Serializer):
@@ -89,4 +89,36 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
 class OrderCancelSerializer(serializers.Serializer):
     reason = serializers.CharField(required=False, allow_blank=True, default='Mijoz yoki kassir tomonidan bekor qilindi.')
+
+
+class TelegramOrderCreateSerializer(serializers.Serializer):
+    """
+    Telegram WebApp orqali buyurtma berish uchun serializer.
+    Telegram foydalanuvchisi va buyurtma ma'lumotlarini qabul qiladi.
+    """
+    telegram_id = serializers.IntegerField(required=True)
+    phone = serializers.CharField(required=True, max_length=30)
+    first_name = serializers.CharField(required=False, allow_blank=True, default='')
+    last_name = serializers.CharField(required=False, allow_blank=True, default='')
+    telegram_username = serializers.CharField(required=False, allow_blank=True, default='')
+    items = OrderItemInputSerializer(many=True, required=True)
+    order_type = serializers.ChoiceField(choices=OrderType.choices, default=OrderType.TAKEAWAY)
+    payment_type = serializers.ChoiceField(choices=PaymentType.choices, default=PaymentType.CASH)
+    delivery_address = serializers.CharField(required=False, allow_blank=True, default='')
+    notes = serializers.CharField(required=False, allow_blank=True, default='')
+
+    def validate_items(self, value):
+        if not value:
+            raise serializers.ValidationError("Kamida bitta mahsulot kiritilishi shart.")
+        return value
+
+    def create(self, validated_data):
+        items_data = validated_data.pop('items')
+        return telegram_order_create(
+            items_data=items_data,
+            **validated_data
+        )
+
+    def to_representation(self, instance):
+        return OrderDetailSerializer(instance).data
 

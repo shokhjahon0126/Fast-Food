@@ -31,6 +31,12 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://*.ngrok-free.app,https://*.ngrok-free.dev',
+    cast=lambda v: [s.strip() for s in v.split(',') if s.strip()]
+)
+
 
 # Application definition
 
@@ -54,6 +60,7 @@ INSTALLED_APPS = [
     'apps.products',
     'apps.orders',
     'apps.analytics',
+    'apps.webapp',
     "phonenumber_field",
 ]
 
@@ -190,3 +197,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=config("REFRESH_TOKEN_LIFETIME",cast=int,default=30)),
     "SIGNING_KEY": config("SECRET_KEY"),
 }
+
+# Telegram WebApp & Bot
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_WEBAPP_URL = config('TELEGRAM_WEBAPP_URL', default='http://127.0.0.1:8000/webapp/')
