@@ -26,6 +26,13 @@ class User(AbstractUser):
         db_index=True,
         verbose_name=_('Phone Number'),
     )
+    telegram_id = models.BigIntegerField(
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name=_('Telegram ID'),
+    )
 
     class Meta:
         verbose_name = _('User')
@@ -34,6 +41,7 @@ class User(AbstractUser):
         indexes = [
             models.Index(fields=['role', 'is_active']),
             models.Index(fields=['username']),
+            models.Index(fields=['telegram_id']),
         ]
 
     @property

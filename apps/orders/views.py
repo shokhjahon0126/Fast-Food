@@ -1,6 +1,7 @@
-from rest_framework import viewsets, permissions, status, mixins
+from rest_framework import viewsets, permissions, status, mixins, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
 from apps.orders.models import Order
 from apps.users.permissions import IsAdminOrCashier
 from apps.orders.selectors import get_customer_orders_queryset, get_cashier_orders_queryset
@@ -10,6 +11,7 @@ from apps.orders.serializers import (
     OrderCreateSerializer,
     OrderDetailSerializer,
     OrderCancelSerializer,
+    TelegramOrderCreateSerializer,
 )
 
 
@@ -101,3 +103,21 @@ class CashierOrderViewSet(viewsets.ReadOnlyModelViewSet):
 
         cancelled_order = order_cancel(order=order, reason=reason, user=request.user)
         return Response(OrderDetailSerializer(cancelled_order).data, status=status.HTTP_200_OK)
+
+
+class TelegramOrderCreateView(generics.CreateAPIView):
+    """
+    Telegram WebApp orqali yangi buyurtma yaratish endpointi.
+    Public API: Telegram foydalanuvchisi ma'lumotlari va buyurtma buyumlari bilan chaqiriladi.
+    """
+    permission_classes = [permissions.AllowAny]
+    serializer_class = TelegramOrderCreateSerializer
+
+    @extend_schema(
+        tags=['Orders'],
+        summary="Telegram WebApp orqali buyurtma berish",
+        description="Telegram WebApp mijozi tomonidan buyurtma berish (avtomatik ro'yxatdan o'tish bilan).",
+        responses={201: OrderDetailSerializer},
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)

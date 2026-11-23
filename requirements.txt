@@ -15,6 +15,7 @@ phonenumberslite==9.0.43
 psycopg2-binary==2.9.13
 PyJWT==2.15.1
 python-decouple==3.8
+python-telegram-bot==22.8
 PyYAML==6.0.3
 referencing==0.37.0
 rpds-py==2026.9.1

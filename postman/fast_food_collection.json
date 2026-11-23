@@ -459,6 +459,25 @@
       "name": "Orders Management (Buyurtmalar va Kassa)",
       "item": [
         {
+          "name": "Create Telegram Order (Telegram WebApp orqali buyurtma)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telegram_id\": 987654321,\n  \"first_name\": \"Javohir\",\n  \"last_name\": \"Usmonov\",\n  \"telegram_username\": \"javohir_u\",\n  \"phone\": \"+998901234567\",\n  \"order_type\": \"takeaway\",\n  \"payment_type\": \"cash\",\n  \"delivery_address\": \"\",\n  \"notes\": \"Piyozsiz bo'lsin\",\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2,\n      \"notes\": \"Issiqroq bo'lsin\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/telegram-order/",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "telegram-order", ""]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Create Order (Mijoz buyurtma berishi)",
           "request": {
             "method": "POST",
